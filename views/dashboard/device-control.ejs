@@ -1,0 +1,413 @@
+<%- include('../partials/header') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0"><i class="fas fa-sliders-h me-2"></i>Kontrol Perangkat</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-end">
+            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item active">Kontrol Perangkat</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Device Control Card -->
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-tint me-2"></i>
+              Kontrol Keran Air
+            </div>
+            <div class="card-body">
+              <div class="d-flex flex-column flex-md-row align-items-md-center mb-4">
+                <div class="me-md-3 mb-2 mb-md-0 text-center text-md-start">
+                  <div id="valve-indicator" class="status-indicator d-inline-block <%= latestValues.valveStatus === 'on' ? 'status-on' : 'status-off' %>"></div>
+                </div>
+                <div class="mb-2 mb-md-0 text-center text-md-start">
+                  <h4 id="valve-status-text" class="m-0">
+                    Status: <%= latestValues.valveStatus === 'on' ? 'Aktif' : 'Tidak Aktif' %>
+                  </h4>
+                  <p class="text-muted mb-0">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <span id="valve-status-info">
+                      <%= latestValues.valveStatus === 'on' ? 'Keran air sedang menyala' : 'Keran air sedang mati' %>
+                    </span>
+                  </p>
+                </div>
+              </div>
+              
+              <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                  <div class="d-flex align-items-center justify-content-center justify-content-md-start">
+                    <label class="me-3 mb-0">Kendali Otomatis:</label>
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="valve-toggle" <%= latestValues.autoStatus === 'on' ? 'checked' : '' %>>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex justify-content-center justify-content-md-end">
+                    <button id="valve-on" class="btn btn-success me-2">
+                      <i class="fas fa-play me-2"></i>Hidupkan
+                    </button>
+                    <button id="valve-off" class="btn btn-danger">
+                      <i class="fas fa-stop me-2"></i>Matikan
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <hr>
+              
+              <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle me-2"></i>
+                Perubahan status keran air akan dicatat dalam log aktivitas.
+              </div>
+            </div>
+          </div>
+          
+          <!-- Device Info Card -->
+          <div class="card mt-4">
+            <div class="card-header">
+              <i class="fas fa-info-circle me-2"></i>
+              Informasi Perangkat
+            </div>
+            <div class="card-body">
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <td width="40%"><i class="fas fa-tag me-2"></i>Nama Perangkat</td>
+                    <td>Selenoid Valve Keran Air</td>
+                  </tr>
+                  <tr>
+                    <td><i class="fas fa-microchip me-2"></i>Tipe Perangkat</td>
+                    <td>Aktuator</td>
+                  </tr>
+                  <tr>
+                    <td><i class="fas fa-wifi me-2"></i>Status Koneksi</td>
+                    <td><span class="badge bg-success">Online</span></td>
+                  </tr>
+                  <tr>
+                    <td><i class="fas fa-calendar-alt me-2"></i>Terakhir Aktif</td>
+                    <td id="last-active">Baru saja</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Device Logs Card -->
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-history me-2"></i>
+              Log Aktivitas Perangkat
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Waktu</th>
+                      <th>Aksi</th>
+                      <th>Status</th>
+                      <th>Oleh</th>
+                    </tr>
+                  </thead>
+                  <tbody id="device-logs">
+                    <% if (logs && logs.length > 0) { %>
+                      <% logs.forEach(log => { %>
+                        <tr>
+                          <td><%= new Date(log.timestamp).toLocaleString('id-ID') %></td>
+                          <td>
+                            <% if (log.action === 'manual_control') { %>
+                              <span class="badge bg-primary">Kendali Manual</span>
+                            <% } else { %>
+                              <span class="badge bg-info">Update Status</span>
+                            <% } %>
+                          </td>
+                          <td>
+                            <% if (log.status === 'on') { %>
+                              <span class="badge bg-success">Hidup</span>
+                            <% } else { %>
+                              <span class="badge bg-danger">Mati</span>
+                            <% } %>
+                          </td>
+                          <td><%= log.performed_by %></td>
+                        </tr>
+                      <% }) %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="4" class="text-center">Tidak ada log aktivitas</td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              
+              <div class="d-flex justify-content-center mt-3">
+                <button id="refresh-logs" class="btn btn-outline-secondary">
+                  <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Additional Info Card -->
+          <div class="card mt-4">
+            <div class="card-header">
+              <i class="fas fa-lightbulb me-2"></i>
+              Tips Penggunaan
+            </div>
+            <div class="card-body">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <i class="fas fa-check-circle text-success me-2"></i>
+                  Pastikan tanaman tidak terlalu kering sebelum menyiram
+                </li>
+                <li class="list-group-item">
+                  <i class="fas fa-check-circle text-success me-2"></i>
+                  Cek kelembaban tanah sebelum menyalakan keran air
+                </li>
+                <li class="list-group-item">
+                  <i class="fas fa-check-circle text-success me-2"></i>
+                  Matikan keran air setelah kelembaban tanah mencapai 60-70%
+                </li>
+                <li class="list-group-item">
+                  <i class="fas fa-check-circle text-success me-2"></i>
+                  Hindari menyiram tanaman di siang hari yang terik
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Device Control JavaScript -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const valveToggle = document.getElementById('valve-toggle');
+    const valveOn = document.getElementById('valve-on');
+    const valveOff = document.getElementById('valve-off');
+    const valveIndicator = document.getElementById('valve-indicator');
+    const valveStatusText = document.getElementById('valve-status-text');
+    const valveStatusInfo = document.getElementById('valve-status-info');
+    const refreshLogsBtn = document.getElementById('refresh-logs');
+    
+    // Handle toggle switch
+    valveToggle.addEventListener('change', function() {
+      const action = this.checked ? 'on' : 'off';
+	  controlAuto(action);
+    });
+    
+    // Handle on button
+    valveOn.addEventListener('click', function() {
+	  controlAuto('off');
+      controlValve('on');
+    });
+    
+    // Handle off button
+    valveOff.addEventListener('click', function() {
+	  controlAuto('off');
+      controlValve('off');
+    });
+    
+    // Handle refresh logs button
+    refreshLogsBtn.addEventListener('click', function() {
+      fetchDeviceLogs();
+    });
+    
+    // Function to control valve
+    function controlValve(action) {
+      // Show loading state
+      valveOn.disabled = true;
+      valveOff.disabled = true;
+      
+      fetch('/dashboard/device-control', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          device: 'water_valve',
+          action: action
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update UI
+          if (action === 'on') {
+            valveIndicator.classList.remove('status-off');
+            valveIndicator.classList.add('status-on');
+            valveStatusText.textContent = 'Status: Aktif';
+            valveStatusInfo.textContent = 'Keran air sedang menyala';
+          } else {
+            valveIndicator.classList.remove('status-on');
+            valveIndicator.classList.add('status-off');
+            valveStatusText.textContent = 'Status: Tidak Aktif';
+            valveStatusInfo.textContent = 'Keran air sedang mati';
+          }
+          
+          // Fetch updated logs
+          fetchDeviceLogs();
+        } else {
+          // Show error
+          alert('Gagal mengontrol perangkat: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat mengontrol perangkat');
+      })
+      .finally(() => {
+        // Re-enable buttons
+        valveOn.disabled = false;
+        valveOff.disabled = false;
+      });
+    }
+	
+	function controlAuto(action) {
+      // Show loading state
+      valveToggle.disabled = true;
+      
+      fetch('/dashboard/auto-control', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          device: 'water_valve',
+          action: action
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          
+          // Fetch updated logs
+          fetchDeviceLogs();
+        } else {
+          // Show error
+          alert('Gagal mengontrol perangkat: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat mengontrol perangkat');
+      })
+      .finally(() => {
+        // Re-enable buttons
+        valveToggle.disabled = false;
+      });
+    }
+    
+    // Function to fetch device logs
+    function fetchDeviceLogs() {
+      fetch('/dashboard/device-logs?device=water_valve&limit=10')
+        .then(response => response.json())
+        .then(data => {
+          if (data.logs) {
+            updateLogsTable(data.logs);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching logs:', error);
+        });
+    }
+    
+    // Function to update logs table
+    function updateLogsTable(logs) {
+      const logsTable = document.getElementById('device-logs');
+      
+      if (logs.length === 0) {
+        logsTable.innerHTML = `
+          <tr>
+            <td colspan="4" class="text-center">Tidak ada log aktivitas</td>
+          </tr>
+        `;
+        return;
+      }
+      
+      let html = '';
+      
+      logs.forEach(log => {
+        const timestamp = new Date(log.timestamp).toLocaleString('id-ID');
+        const actionBadge = log.action === 'manual_control' 
+          ? '<span class="badge bg-primary">Kendali Manual</span>'
+          : '<span class="badge bg-info">Update Status</span>';
+        const statusBadge = log.status === 'on'
+          ? '<span class="badge bg-success">Hidup</span>'
+          : '<span class="badge bg-danger">Mati</span>';
+          
+        html += `
+          <tr>
+            <td>${timestamp}</td>
+            <td>${actionBadge}</td>
+            <td>${statusBadge}</td>
+            <td>${log.performed_by}</td>
+          </tr>
+        `;
+      });
+      
+      logsTable.innerHTML = html;
+    }
+    
+    // Function to get device status
+    function getDeviceStatus() {
+      fetch('/api/device-status?device=water_valve')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const status = data.data.status;
+            const autoStatus = data.data.autoStatus;
+            
+            // Update valve status UI
+            if (status === 'on') {
+              valveIndicator.classList.remove('status-off');
+              valveIndicator.classList.add('status-on');
+              valveStatusText.textContent = 'Status: Aktif';
+              valveStatusInfo.textContent = 'Keran air sedang menyala';
+            } else {
+              valveIndicator.classList.remove('status-on');
+              valveIndicator.classList.add('status-off');
+              valveStatusText.textContent = 'Status: Tidak Aktif';
+              valveStatusInfo.textContent = 'Keran air sedang mati';
+            }
+            
+            // Update auto control toggle
+            valveToggle.checked = autoStatus === 'on';
+          }
+        })
+        .catch(error => {
+          console.error('Error getting device status:', error);
+        });
+    }
+    
+    // Update device status and logs every 10 seconds
+    setInterval(function() {
+      getDeviceStatus();
+      fetchDeviceLogs();
+      
+      // Update last active time
+      document.getElementById('last-active').textContent = 'Baru saja';
+    }, 10000);
+  });
+</script>
+
+<%- include('../partials/footer') %>

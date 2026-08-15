@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | Smart Garden IoT</title>
+  <!-- Bootstrap CSS from CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --primary-dark: #27ae60;
+      --primary-light: #d5f5e3;
+      --secondary: #3498db;
+      --accent: #f39c12;
+      --text-dark: #2c3e50;
+      --text-light: #ecf0f1;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9f9f9;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .login-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .login-left {
+      flex: 1;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-right {
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      padding: 2.5rem;
+      border-radius: 20px;
+      background-color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .illustration-container {
+      text-align: center;
+      max-width: 500px;
+    }
+
+    .app-logo {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      animation: fadeInDown 1s ease;
+    }
+
+    .app-logo i {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-right: 0.75rem;
+      animation: pulse 2s infinite;
+    }
+
+    .app-logo h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    .login-form h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    .form-control {
+      height: 3.25rem;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      transition: var(--transition);
+      box-shadow: none !important;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      background-color: #f9fffc;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group-text {
+      border-radius: 10px 0 0 10px;
+      border: 1px solid #e0e0e0;
+      border-right: none;
+      background-color: white;
+      color: var(--primary);
+      font-size: 1.2rem;
+      padding: 0.75rem 1rem;
+    }
+
+    .btn-login {
+      height: 3.25rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      border: none;
+      color: white;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+      transition: var(--transition);
+      margin-top: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-login::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: var(--transition);
+    }
+
+    .btn-login:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+      background: linear-gradient(to right, var(--primary-dark), var(--primary));
+    }
+
+    .btn-login:hover::before {
+      left: 100%;
+      transition: 0.7s;
+    }
+
+    .login-footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: #aaa;
+      animation: fadeInUp 1.2s ease;
+    }
+
+    .garden-illustration {
+      width: 90%;
+      max-width: 500px;
+      margin-bottom: 2rem;
+      animation: float 6s ease-in-out infinite;
+      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+    }
+
+    .features-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      margin-top: 2rem;
+      animation: fadeInUp 1.4s ease;
+    }
+
+    .features-list li {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .features-list i {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.75rem;
+      font-size: 1rem;
+    }
+
+    .floating-leaves {
+      position: absolute;
+      opacity: 0.1;
+      z-index: 0;
+    }
+
+    .leaf-1 {
+      top: 10%;
+      left: 10%;
+      font-size: 4rem;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .leaf-2 {
+      top: 70%;
+      left: 15%;
+      font-size: 5rem;
+      animation: float 10s ease-in-out infinite;
+    }
+
+    .leaf-3 {
+      top: 30%;
+      right: 10%;
+      font-size: 6rem;
+      animation: float 9s ease-in-out infinite 1s;
+    }
+
+    .leaf-4 {
+      bottom: 10%;
+      right: 20%;
+      font-size: 3.5rem;
+      animation: float 7s ease-in-out infinite 0.5s;
+    }
+
+    .card-decoration {
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(46, 204, 113, 0));
+      z-index: 0;
+    }
+
+    .alert {
+      border-radius: 10px;
+      animation: shake 0.5s ease;
+    }
+
+    /* Animations */
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-15px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+      }
+      20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+      }
+    }
+
+    /* Responsive styles */
+    @media (max-width: 992px) {
+      .login-container {
+        flex-direction: column;
+      }
+
+      .login-right {
+        display: none;
+      }
+
+      .login-left {
+        width: 100%;
+        padding: 2rem 1rem;
+      }
+
+      .login-card {
+        max-width: 450px;
+        box-shadow: var(--shadow);
+      }
+    }
+
+    @media (max-width: 576px) {
+      .login-card {
+        padding: 1.5rem;
+      }
+
+      .app-logo h1 {
+        font-size: 1.5rem;
+      }
+
+      .app-logo i {
+        font-size: 2rem;
+      }
+
+      .login-form h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-container">
+    <div class="login-left">
+      <div class="app-logo">
+        <i class="fas fa-leaf"></i>
+        <h1>Smart Garden IoT</h1>
+      </div>
+
+      <div class="login-card">
+        <div class="card-decoration"></div>
+        
+        <div class="login-form">
+          <h2>Selamat Datang Kembali</h2>
+
+          <% if (error) { %>
+          <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <%= error %>
+          </div>
+          <% } %>
+
+          <form action="/login" method="POST">
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-user"></i>
+              </span>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username" required>
+            </div>
+
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-lock"></i>
+              </span>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-login">
+                <i class="fas fa-sign-in-alt me-2"></i> Masuk
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="login-footer">
+        <p>Smart Garden IoT Dashboard &copy; <%= new Date().getFullYear() %></p>
+      </div>
+    </div>
+
+    <div class="login-right">
+      <!-- Floating leaves decoration -->
+      <div class="floating-leaves leaf-1">
+        <i class="fas fa-leaf"></i>
+      </div>
+      <div class="floating-leaves leaf-2">
+        <i class="fas fa-seedling"></i>
+      </div>
+      <div class="floating-leaves leaf-3">
+        <i class="fas fa-leaf"></i>
+      </div>
+      <div class="floating-leaves leaf-4">
+        <i class="fas fa-seedling"></i>
+      </div>
+
+      <div class="illustration-container">
+        <!-- Garden Illustration SVG -->
+        <svg class="garden-illustration" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%">
+          <style>
+            .st0{fill:#FFFFFF;}
+            .st1{fill:#ECF0F1;}
+            .st2{fill:#D5F5E3;}
+            .st3{fill:#2ECC71;}
+            .st4{fill:#27AE60;}
+            .st5{fill:#3498DB;}
+            .st6{fill:#F1C40F;}
+            .st7{fill:#E67E22;}
+            .st8{fill:#95A5A6;}
+          </style>
+          <!-- Sky background -->
+          <rect class="st1" width="800" height="600"/>
+          <!-- Sun -->
+          <circle class="st6" cx="650" cy="100" r="50"/>
+          <!-- Clouds -->
+          <ellipse class="st0" cx="200" cy="120" rx="60" ry="40"/>
+          <ellipse class="st0" cx="250" cy="100" rx="70" ry="45"/>
+          <ellipse class="st0" cx="300" cy="130" rx="50" ry="35"/>
+          
+          <ellipse class="st0" cx="500" cy="80" rx="50" ry="30"/>
+          <ellipse class="st0" cx="550" cy="70" rx="60" ry="35"/>
+          <ellipse class="st0" cx="600" cy="90" rx="40" ry="25"/>
+          
+          <!-- Ground -->
+          <path class="st2" d="M0,400 C100,380 200,420 300,390 C400,360 500,410 600,380 C700,350 800,390 800,390 L800,600 L0,600 Z"/>
+          
+          <!-- Garden beds -->
+          <rect class="st8" x="100" y="420" width="200" height="30" rx="5" ry="5"/>
+          <rect class="st8" x="500" y="420" width="200" height="30" rx="5" ry="5"/>
+          <rect class="st1" x="110" y="380" width="180" height="40" rx="3" ry="3"/>
+          <rect class="st1" x="510" y="380" width="180" height="40" rx="3" ry="3"/>
+          
+          <!-- Plants in first garden bed -->
+          <path class="st4" d="M140,380 C140,350 130,340 120,335 C130,333 145,335 150,350 C155,335 170,333 180,335 C170,340 160,350 160,380 Z"/>
+          <rect class="st7" x="148" y="380" width="4" height="30"/>
+          
+          <path class="st4" d="M200,380 C200,350 190,340 180,335 C190,333 205,335 210,350 C215,335 230,333 240,335 C230,340 220,350 220,380 Z"/>
+          <rect class="st7" x="208" y="380" width="4" height="30"/>
+          
+          <path class="st4" d="M260,380 C260,350 250,340 240,335 C250,333 265,335 270,350 C275,335 290,333 300,335 C290,340 280,350 280,380 Z"/>
+          <rect class="st7" x="268" y="380" width="4" height="30"/>
+          
+          <!-- Plants in second garden bed -->
+          <path class="st3" d="M540,380 C540,350 530,340 520,335 C530,333 545,335 550,350 C555,335 570,333 580,335 C570,340 560,350 560,380 Z"/>
+          <rect class="st7" x="548" y="380" width="4" height="30"/>
+          
+          <path class="st3" d="M600,380 C600,350 590,340 580,335 C590,333 605,335 610,350 C615,335 630,333 640,335 C630,340 620,350 620,380 Z"/>
+          <rect class="st7" x="608" y="380" width="4" height="30"/>
+          
+          <path class="st3" d="M660,380 C660,350 650,340 640,335 C650,333 665,335 670,350 C675,335 690,333 700,335 C690,340 680,350 680,380 Z"/>
+          <rect class="st7" x="668" y="380" width="4" height="30"/>
+          
+          <!-- IoT Device -->
+          <rect class="st8" x="370" y="430" width="60" height="80" rx="5" ry="5"/>
+          <rect class="st5" x="380" y="440" width="40" height="25" rx="3" ry="3"/>
+          <circle class="st0" cx="400" cy="490" r="10"/>
+          <circle class="st3" cx="400" cy="490" r="5"/>
+          
+          <!-- Water droplets animation -->
+          <circle class="st5" cx="400" cy="425" r="3">
+            <animate attributeName="cy" values="425;435;445" dur="1s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.8;0" dur="1s" repeatCount="indefinite"/>
+          </circle>
+          <circle class="st5" cx="406" cy="425" r="3">
+            <animate attributeName="cy" values="425;435;445" dur="1s" begin="0.3s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.8;0" dur="1s" begin="0.3s" repeatCount="indefinite"/>
+          </circle>
+          <circle class="st5" cx="394" cy="425" r="3">
+            <animate attributeName="cy" values="425;435;445" dur="1s" begin="0.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.8;0" dur="1s" begin="0.6s" repeatCount="indefinite"/>
+          </circle>
+          
+          <!-- Sprinkler lines -->
+          <line class="st5" x1="400" y1="425" x2="350" y2="390" stroke-width="2" stroke="#3498db">
+            <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+          </line>
+          <line class="st5" x1="400" y1="425" x2="450" y2="390" stroke-width="2" stroke="#3498db">
+            <animate attributeName="opacity" values="0;1;0" dur="2s" begin="1s" repeatCount="indefinite"/>
+          </line>
+        </svg>
+
+        <h3 class="text-white mb-4">Dashboard Monitoring & Kontrol</h3>
+
+        <ul class="features-list">
+          <li>
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Monitoring data sensor realtime</span>
+          </li>
+          <li>
+            <i class="fas fa-history"></i>
+            <span>Riwayat data sensor lengkap</span>
+          </li>
+          <li>
+            <i class="fas fa-sliders-h"></i>
+            <span>Kontrol perangkat dari jarak jauh</span>
+          </li>
+          <li>
+            <i class="fas fa-chart-line"></i>
+            <span>Visualisasi data dengan grafik interaktif</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

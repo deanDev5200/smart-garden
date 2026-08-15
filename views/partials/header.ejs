@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | Smart Garden IoT</title>
+  
+  <!-- Bootstrap CSS from CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1/dist/chartjs-adapter-moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --secondary: #27ae60;
+      --dark: #1e8449;
+      --light: #d5f5e3;
+      --accent: #3498db;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --info: #3498db;
+      --success: #2ecc71;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      background-image: url('https://cdn.jsdelivr.net/gh/tailwindcss/heropatterns@0.3.1/topography.svg');
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: #343a40;
+      color: white;
+      min-height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      transition: all 0.3s;
+    }
+    
+    .sidebar-header {
+      background: var(--primary);
+      padding: 15px;
+      text-align: center;
+    }
+    
+    .sidebar-brand {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .sidebar-brand i {
+      margin-right: 10px;
+      font-size: 1.8rem;
+    }
+    
+    .user-panel {
+      padding: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 10px;
+    }
+    
+    .user-info {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+    
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .sidebar-menu li {
+      margin-bottom: 5px;
+    }
+    
+    .sidebar-menu a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      padding: 12px 15px;
+      display: block;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+    
+    .sidebar-menu a:hover,
+    .sidebar-menu a.active {
+      color: white;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-left-color: var(--primary);
+    }
+    
+    .sidebar-menu a i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    /* Content */
+    .content-wrapper {
+      flex: 1;
+      width: calc(100% - 250px);
+      margin-left: 250px;
+      padding: 20px;
+      transition: all 0.3s;
+      min-height: 100vh;
+    }
+    
+    .content-header {
+      margin-bottom: 20px;
+    }
+    
+    /* Cards */
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: none;
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      background-color: white;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+    }
+    
+    /* Sensor Cards */
+    .sensor-card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      background-color: white;
+      height: 100%;
+    }
+    
+    .sensor-card-header {
+      padding: 15px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+    }
+    
+    .sensor-card-header i {
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+    
+    .sensor-card-body {
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .sensor-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 10px 0;
+    }
+    
+    .sensor-unit {
+      font-size: 1rem;
+      color: #6c757d;
+    }
+    
+    .sensor-status {
+      margin-top: 15px;
+      font-size: 0.9rem;
+    }
+    
+    /* Device Control */
+    .device-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .device-header {
+      padding: 15px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+    }
+    
+    .device-header i {
+      margin-right: 10px;
+    }
+    
+    .device-body {
+      padding: 20px;
+    }
+    
+    .device-status {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .status-indicator {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    
+    .status-on {
+      background-color: var(--success);
+    }
+    
+    .status-off {
+      background-color: var(--danger);
+    }
+    
+    .device-controls {
+      display: flex;
+      gap: 10px;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+      width: 100%;
+      height: 400px !important;
+    }
+    
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+    
+    input:focus + .slider {
+      box-shadow: 0 0 1px var(--primary);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    /* Dashboard Container - ensure it spans full width */
+    .dashboard-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        margin-left: -250px;
+      }
+      
+      .sidebar.active {
+        margin-left: 0;
+      }
+      
+      .content-wrapper {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Mobile Navigation Toggle Button -->
+    <button class="btn btn-primary d-md-none sidebar-toggle position-fixed" style="top: 10px; right: 10px; z-index: 1050;">
+      <i class="fas fa-bars"></i>
+    </button>

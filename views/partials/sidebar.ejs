@@ -1,0 +1,58 @@
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <a href="/dashboard" class="sidebar-brand">
+      <i class="fas fa-leaf"></i>
+      <span>Smart Garden</span>
+    </a>
+  </div>
+
+  <div class="user-panel">
+    <div class="user-info">
+      <i class="fas fa-user-circle me-2"></i>
+      <span><%= user.username %></span>
+    </div>
+  </div>
+
+  <ul class="sidebar-menu">
+    <li>
+      <a href="/dashboard" class="<%= title === 'Smart Garden Dashboard' ? 'active' : '' %>">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/dashboard/device-control" class="<%= title === 'Kontrol Perangkat' ? 'active' : '' %>">
+        <i class="fas fa-sliders-h"></i>
+        <span>Kontrol Perangkat</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/dashboard/sensor-history" class="<%= title === 'History Data Sensor' ? 'active' : '' %>">
+        <i class="fas fa-history"></i>
+        <span>History Data Sensor</span>
+      </a>
+    </li>
+
+    <li class="mt-4">
+      <a href="/change-password" class="<%= title === 'Ganti Password' ? 'active' : '' %>">
+        <i class="fas fa-key"></i>
+        <span>Ganti Password</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </a>
+    </li>
+  </ul>
+
+  <div class="position-absolute bottom-0 p-3 text-center w-100 text-white-50" style="font-size: 0.8rem;">
+    <p class="mb-1">Smart Garden IoT Dashboard</p>
+    <p class="mb-0">&copy; <%= new Date().getFullYear() %></p>
+  </div>
+</div>

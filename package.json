@@ -1,0 +1,43 @@
+{
+    "name": "smart-garden-dashboard",
+    "version": "1.0.0",
+    "description": "Dashboard IoT untuk monitoring dan kontrol smart garden",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "dev": "nodemon app.js",
+        "init-db": "node utils/init-db.js",
+        "prepare-certs": "node utils/prepare-certs.js",
+        "setup": "npm run prepare-certs && npm run init-db"
+    },
+    "keywords": [
+        "iot",
+        "smart-garden",
+        "dashboard",
+        "mqtt",
+        "nodejs"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "bcrypt": "^5.1.1",
+        "connect-sqlite3": "^0.9.13",
+        "cors": "^2.8.5",
+        "csurf": "^1.11.0",
+        "dotenv": "^16.3.1",
+        "ejs": "^3.1.9",
+        "express": "^4.18.2",
+        "express-rate-limit": "^7.1.5",
+        "express-session": "^1.17.3",
+        "express-validator": "^7.0.1",
+        "helmet": "^7.1.0",
+        "mqtt": "^5.1.4",
+        "sqlite3": "^5.1.6",
+        "winston": "^3.11.0",
+        "winston-daily-rotate-file": "^4.7.1",
+        "xss-clean": "^0.1.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.1"
+    }
+}

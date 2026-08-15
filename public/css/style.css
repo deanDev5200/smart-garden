@@ -1,0 +1,271 @@
+/* Custom CSS - Additional styling */
+
+:root {
+    --primary: #2ecc71;
+    --secondary: #27ae60;
+    --dark: #1e8449;
+    --light: #d5f5e3;
+    --accent: #3498db;
+    --danger: #e74c3c;
+    --warning: #f39c12;
+    --info: #3498db;
+    --success: #2ecc71;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    background-image: url('https://cdn.jsdelivr.net/gh/tailwindcss/heropatterns@0.3.1/topography.svg');
+    overflow-x: hidden;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Override bootstrap primary color */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    flex: 1;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Card animations */
+.sensor-card {
+    transition: all 0.3s ease;
+}
+
+.sensor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom animations for value changes */
+.sensor-value {
+    transition: all 0.5s ease;
+}
+
+.value-change {
+    animation: pulse 1s ease;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 400px !important;
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Responsive grid for smaller screens */
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 10px;
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .sidebar {
+        margin-left: -250px;
+        position: fixed;
+        z-index: 1030;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar.active {
+        margin-left: 0;
+    }
+
+    /* Add padding to body when sidebar is active on mobile */
+    body.sidebar-active {
+        overflow: hidden;
+    }
+
+    /* Adjust sensor cards for smaller screens */
+    .sensor-card {
+        height: auto;
+        margin-bottom: 15px;
+    }
+
+    .sensor-value {
+        font-size: 2rem;
+    }
+
+    /* Chart container for mobile */
+    .chart-container {
+        height: 300px !important;
+    }
+
+    /* Button groups responsive */
+    .btn-group {
+        flex-wrap: wrap;
+    }
+
+    .btn-group .btn {
+        margin-bottom: 5px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    /* Even smaller screens */
+    .sensor-value {
+        font-size: 1.8rem;
+    }
+
+    .chart-container {
+        height: 250px !important;
+    }
+
+    /* Stack buttons on very small screens */
+    .device-controls {
+        flex-direction: column;
+    }
+
+    .device-controls button {
+        margin-top: 5px;
+        width: 100%;
+    }
+
+    /* Adjust table for smaller screens */
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+}
+
+/* Toggle button animation */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: var(--primary);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--primary);
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+/* Status indicators */
+.status-indicator {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    transition: all 0.3s ease;
+}
+
+.status-on {
+    background-color: var(--success);
+    box-shadow: 0 0 10px var(--success);
+}
+
+.status-off {
+    background-color: var(--danger);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--secondary);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--dark);
+}
+
+/* Toast container */
+.toast-container {
+    z-index: 1060;
+}
