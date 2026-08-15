@@ -29,13 +29,16 @@ jobs:
       
       - name: Create deployment package
         run: |
-          tar -czf smart-garden-deploy.tar.gz \
+          mkdir -p deploy-temp
+          rsync -av --progress \
             --exclude=node_modules \
             --exclude=.git \
             --exclude=data/*.db \
             --exclude=logs \
             --exclude=.github \
-            .
+            . deploy-temp/
+          tar -czf smart-garden-deploy.tar.gz -C deploy-temp .
+          rm -rf deploy-temp
       
       - name: Copy to Windows server via SSH
         uses: appleboy/scp-action@v0.1.4
