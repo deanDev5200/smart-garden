@@ -47,7 +47,7 @@ const char* MQTT_CLIENT_ID = "esp32_smart_garden";
 #define WATERING_WINDOW_START 6          // Earliest hour for auto watering (6 AM)
 #define WATERING_WINDOW_END 20           // Latest hour for auto watering (8 PM)
 #define MAX_TEMP_FOR_WATERING 35         // Don't water above this temperature (°C)
-#define MIN_HUMIDITY_FOR_WATERING 40     // Don't water if humidity is too high (%)
+#define MIN_HUMIDITY_FOR_WATERING 75     // Don't water if humidity is too high (%)
 
 // Development mode settings
 #define DEVELOPMENT_MODE true     // Set to true for dummy sensor readings when sensors not detected
