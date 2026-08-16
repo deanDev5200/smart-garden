@@ -34,7 +34,7 @@ jobs:
           username: ${{ secrets.WINDOWS_SERVER_USER }}
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
-          script: if (!(Test-Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }})) { New-Item -ItemType Directory -Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }} -Force; cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}; git clone https://github.com/${{ github.repository }}.git . }; New-Item -ItemType Directory -Path "logs" -Force; New-Item -ItemType Directory -Path "data" -Force
+          script: powershell -Command "if (!(Test-Path '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}')) { New-Item -ItemType Directory -Path '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}' -Force; cd '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}'; git clone https://github.com/${{ github.repository }}.git . }; New-Item -ItemType Directory -Path 'logs' -Force; New-Item -ItemType Directory -Path 'data' -Force"
       
       - name: Stop application and backup
         uses: appleboy/ssh-action@v1.0.0
@@ -43,7 +43,7 @@ jobs:
           username: ${{ secrets.WINDOWS_SERVER_USER }}
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
-          script: cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}; taskkill /F /IM node.exe 2>$null || echo "No running Node.js process found"; if (Test-Path "app.js") { $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"; Compress-Archive -Path * -DestinationPath "backup_$timestamp.zip" -Force }
+          script: powershell -Command "cd '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}'; taskkill /F /IM node.exe 2>$null; if (Test-Path 'app.js') { $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'; Compress-Archive -Path * -DestinationPath \"backup_$timestamp.zip\" -Force }"
       
       - name: Pull latest changes
         uses: appleboy/ssh-action@v1.0.0
@@ -52,7 +52,7 @@ jobs:
           username: ${{ secrets.WINDOWS_SERVER_USER }}
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
-          script: cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}; git fetch origin; git checkout main; git pull origin main
+          script: powershell -Command "cd '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}'; git fetch origin; git checkout main; git pull origin main"
       
       - name: Install dependencies and restart
         uses: appleboy/ssh-action@v1.0.0
@@ -61,4 +61,4 @@ jobs:
           username: ${{ secrets.WINDOWS_SERVER_USER }}
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
-          script: cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}; npm ci --production; if (!(Test-Path "data\smart_garden.db")) { npm run init-db }; Start-Process node -ArgumentList "app.js" -NoNewWindow -RedirectStandardOutput "logs\app.log" -RedirectStandardError "logs\error.log"; echo "Deployment completed successfully"
+          script: powershell -Command "cd '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}'; npm ci --production; if (!(Test-Path 'data\smart_garden.db')) { npm run init-db }; Start-Process node -ArgumentList 'app.js' -NoNewWindow -RedirectStandardOutput 'logs\app.log' -RedirectStandardError 'logs\error.log'; Write-Host 'Deployment completed successfully'"
