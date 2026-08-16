@@ -25,7 +25,7 @@ You need to add the following secrets to your GitHub repository:
 - **WINDOWS_SERVER_USER**: SSH username for the Windows server
 - **WINDOWS_SERVER_PASSWORD**: SSH password for the Windows server
 - **WINDOWS_SERVER_PORT**: SSH port (default: 22)
-- **WINDOWS_DEPLOY_PATH**: Deployment path on Windows server (default: `/c/smart-garden` which is Unix-style for `C:\smart-garden`)
+- **WINDOWS_DEPLOY_PATH**: Deployment path on Windows server (default: `C:\smart-garden`)
 
 ### Example Values:
 ```
@@ -33,7 +33,7 @@ WINDOWS_SERVER_HOST: 192.168.1.100
 WINDOWS_SERVER_USER: administrator
 WINDOWS_SERVER_PASSWORD: your_secure_password
 WINDOWS_SERVER_PORT: 22
-WINDOWS_DEPLOY_PATH: /c/smart-garden
+WINDOWS_DEPLOY_PATH: C:\smart-garden
 ```
 
 ## Windows Server Setup

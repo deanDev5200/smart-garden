@@ -40,25 +40,31 @@ jobs:
           tar -czf smart-garden-deploy.tar.gz -C deploy-temp .
           rm -rf deploy-temp
       
-      - name: Copy to Windows server via SSH
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.WINDOWS_SERVER_HOST }}
-          username: ${{ secrets.WINDOWS_SERVER_USER }}
-          password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
-          port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
-          source: "smart-garden-deploy.tar.gz"
-          target: ${{ secrets.WINDOWS_DEPLOY_PATH || '/c/smart-garden' }}
+      - name: Read deployment package content
+        id: read_file
+        run: |
+          CONTENT=$(base64 -w 0 smart-garden-deploy.tar.gz)
+          echo "content=$CONTENT" >> $GITHUB_OUTPUT
       
-      - name: Extract and restart application on Windows server
+      - name: Upload and deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.WINDOWS_SERVER_HOST }}
           username: ${{ secrets.WINDOWS_SERVER_USER }}
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
+          script_stop: true
           script: |
-            cd ${{ secrets.WINDOWS_DEPLOY_PATH || '/c/smart-garden' }}
+            cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}
+            
+            # Create deployment directory if it doesn't exist
+            if (!(Test-Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }})) {
+              New-Item -ItemType Directory -Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }} -Force
+            }
+            
+            # Create logs and data directories
+            New-Item -ItemType Directory -Path "logs" -Force
+            New-Item -ItemType Directory -Path "data" -Force
             
             # Stop existing application
             taskkill /F /IM node.exe 2>$null || echo "No running Node.js process found"
@@ -69,11 +75,26 @@ jobs:
               Compress-Archive -Path * -DestinationPath "backup_$timestamp.zip" -Force
             }
             
-            # Extract new deployment
-            Expand-Archive -Path smart-garden-deploy.tar.gz -DestinationPath . -Force
+            # Receive base64 encoded file and decode
+            $base64Content = "${{ steps.read_file.outputs.content }}"
+            $bytes = [System.Convert]::FromBase64String($base64Content)
+            [System.IO.File]::WriteAllBytes("smart-garden-deploy.tar.gz", $bytes)
+            
+            # Extract new deployment using tar (if available) or manually
+            if (Get-Command tar -ErrorAction SilentlyContinue) {
+              tar -xzf smart-garden-deploy.tar.gz
+            } else {
+              # Fallback: use 7-Zip if available
+              if (Get-Command 7z -ErrorAction SilentlyContinue) {
+                7z x smart-garden-deploy.tar.gz -y
+              } else {
+                echo "ERROR: No tar or 7z available to extract archive"
+                exit 1
+              }
+            }
             
             # Clean up deployment package
-            Remove-Item smart-garden-deploy.tar.gz
+            Remove-Item smart-garden-deploy.tar.gz -Force
             
             # Install dependencies
             npm ci --production
