@@ -1,12 +1,13 @@
 # GitHub Actions Deployment Setup
 
-This guide explains how to set up automatic deployment to your Windows server using GitHub Actions.
+This guide explains how to set up automatic deployment to your Windows server using GitHub Actions with Git pull approach.
 
 ## Prerequisites
 
 1. **GitHub Repository** - Your project must be in a GitHub repository
 2. **Windows Server** - Access to your Windows server with:
    - SSH enabled (OpenSSH Server)
+   - Git installed
    - Node.js installed
    - PowerShell available
 3. **Network Access** - GitHub Actions must be able to reach your server
@@ -54,7 +55,18 @@ Set-Service -Name sshd -StartupType 'Automatic'
 New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
 ```
 
-### 2. Create Deployment Directory
+### 2. Install Git on Windows
+
+Download and install Git from https://git-scm.com/download/win or use:
+
+```powershell
+# Using Chocolatey (if available)
+choco install git
+
+# Or download manually and install
+```
+
+### 3. Create Deployment Directory
 
 ```powershell
 # Create deployment directory
@@ -67,7 +79,7 @@ New-Item -Path "C:\smart-garden\logs" -ItemType Directory -Force
 New-Item -Path "C:\smart-garden\data" -ItemType Directory -Force
 ```
 
-### 3. Install Node.js (if not already installed)
+### 4. Install Node.js (if not already installed)
 
 Download and install Node.js from https://nodejs.org/ or use:
 
@@ -78,13 +90,25 @@ choco install nodejs
 # Or download manually and install
 ```
 
-### 4. Configure .env File
+### 5. Configure .env File
 
 Copy your `.env` file to the server:
 
 ```powershell
 # Create .env file on server
 # Copy your existing .env content or create a new one
+```
+
+### 6. Initial Git Setup (First Time Only)
+
+```powershell
+cd C:\smart-garden
+
+# Clone your repository
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git .
+
+# Or if you prefer SSH (requires SSH key setup)
+git clone git@github.com:YOUR_USERNAME/YOUR_REPO.git .
 ```
 
 ## Deployment Workflow
@@ -95,11 +119,10 @@ The GitHub Actions workflow will:
    - Checkout the latest code
    - Install dependencies
    - Run tests (if available)
-   - Create deployment package
-   - Copy package to Windows server via SSH
+   - Connect to Windows server via SSH
    - Stop existing Node.js process
    - Backup current version
-   - Extract new deployment
+   - Pull latest changes from GitHub
    - Install production dependencies
    - Initialize database if needed
    - Start the application
@@ -127,6 +150,20 @@ Get-Service sshd
 
 # Check firewall rules
 Get-NetFirewallRule -Name sshd
+```
+
+### Git Issues
+
+```powershell
+# Check Git is installed
+git --version
+
+# Configure Git credentials (if needed)
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# Test Git connection
+git ls-remote https://github.com/YOUR_USERNAME/YOUR_REPO.git
 ```
 
 ### Permission Issues
@@ -188,15 +225,29 @@ icacls.exe $authorizedKeys /inheritance:r /grant "Administrators:F"
 
 3. Update GitHub workflow to use SSH key:
 ```yaml
-- name: Copy to Windows server via SSH
-  uses: appleboy/scp-action@v0.1.4
+- name: Deploy via SSH
+  uses: appleboy/ssh-action@v1.0.0
   with:
     host: ${{ secrets.WINDOWS_SERVER_HOST }}
     username: ${{ secrets.WINDOWS_SERVER_USER }}
     key: ${{ secrets.WINDOWS_SSH_PRIVATE_KEY }}
     port: ${{ secrets.WINDOWS_SERVER_PORT }}
-    source: "smart-garden-deploy.tar.gz"
-    target: ${{ secrets.WINDOWS_DEPLOY_PATH }}
+    script: |
+      # Your deployment script
+```
+
+### Using GitHub Personal Access Token
+
+If your repository is private, you may need to authenticate Git:
+
+```powershell
+cd C:\smart-garden
+
+# Set up Git credential helper
+git config --global credential.helper store
+
+# Or use personal access token in URL
+git clone https://TOKEN@github.com/YOUR_USERNAME/YOUR_REPO.git
 ```
 
 ### Environment-Specific Deployments
@@ -225,9 +276,26 @@ taskkill /F /IM node.exe 2>$null
 Start-Process node -ArgumentList "app.js" -NoNewWindow
 ```
 
+Or use Git to revert:
+
+```powershell
+cd C:\smart-garden
+
+# View recent commits
+git log --oneline -10
+
+# Revert to previous commit
+git checkout PREVIOUS_COMMIT_HASH
+
+# Restart application
+taskkill /F /IM node.exe 2>$null
+Start-Process node -ArgumentList "app.js" -NoNewWindow
+```
+
 ## Support
 
 For issues with:
 - **GitHub Actions**: Check GitHub Actions documentation
 - **SSH on Windows**: Microsoft OpenSSH documentation
+- **Git on Windows**: Git for Windows documentation
 - **Node.js on Windows**: Node.js Windows installation guide

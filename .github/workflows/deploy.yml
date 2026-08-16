@@ -27,26 +27,7 @@ jobs:
         run: npm test --if-present
         continue-on-error: true
       
-      - name: Create deployment package
-        run: |
-          mkdir -p deploy-temp
-          rsync -av --progress \
-            --exclude=node_modules \
-            --exclude=.git \
-            --exclude=data/*.db \
-            --exclude=logs \
-            --exclude=.github \
-            . deploy-temp/
-          tar -czf smart-garden-deploy.tar.gz -C deploy-temp .
-          rm -rf deploy-temp
-      
-      - name: Read deployment package content
-        id: read_file
-        run: |
-          CONTENT=$(base64 -w 0 smart-garden-deploy.tar.gz)
-          echo "content=$CONTENT" >> $GITHUB_OUTPUT
-      
-      - name: Upload and deploy via SSH
+      - name: Deploy via SSH (Git pull approach)
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.WINDOWS_SERVER_HOST }}
@@ -60,6 +41,8 @@ jobs:
             # Create deployment directory if it doesn't exist
             if (!(Test-Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }})) {
               New-Item -ItemType Directory -Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }} -Force
+              cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}
+              git clone https://github.com/${{ github.repository }}.git .
             }
             
             # Create logs and data directories
@@ -75,26 +58,10 @@ jobs:
               Compress-Archive -Path * -DestinationPath "backup_$timestamp.zip" -Force
             }
             
-            # Receive base64 encoded file and decode
-            $base64Content = "${{ steps.read_file.outputs.content }}"
-            $bytes = [System.Convert]::FromBase64String($base64Content)
-            [System.IO.File]::WriteAllBytes("smart-garden-deploy.tar.gz", $bytes)
-            
-            # Extract new deployment using tar (if available) or manually
-            if (Get-Command tar -ErrorAction SilentlyContinue) {
-              tar -xzf smart-garden-deploy.tar.gz
-            } else {
-              # Fallback: use 7-Zip if available
-              if (Get-Command 7z -ErrorAction SilentlyContinue) {
-                7z x smart-garden-deploy.tar.gz -y
-              } else {
-                echo "ERROR: No tar or 7z available to extract archive"
-                exit 1
-              }
-            }
-            
-            # Clean up deployment package
-            Remove-Item smart-garden-deploy.tar.gz -Force
+            # Pull latest changes from GitHub
+            git fetch origin
+            git checkout main
+            git pull origin main
             
             # Install dependencies
             npm ci --production
