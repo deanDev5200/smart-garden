@@ -35,43 +35,4 @@ jobs:
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
           script_stop: true
-          script: |
-            cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}
-            
-            # Create deployment directory if it doesn't exist
-            if (!(Test-Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }})) {
-              New-Item -ItemType Directory -Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }} -Force
-              cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}
-              git clone https://github.com/${{ github.repository }}.git .
-            }
-            
-            # Create logs and data directories
-            New-Item -ItemType Directory -Path "logs" -Force
-            New-Item -ItemType Directory -Path "data" -Force
-            
-            # Stop existing application
-            taskkill /F /IM node.exe 2>$null || echo "No running Node.js process found"
-            
-            # Backup current version
-            if (Test-Path "app.js") {
-              $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-              Compress-Archive -Path * -DestinationPath "backup_$timestamp.zip" -Force
-            }
-            
-            # Pull latest changes from GitHub
-            git fetch origin
-            git checkout main
-            git pull origin main
-            
-            # Install dependencies
-            npm ci --production
-            
-            # Initialize database if needed
-            if (!(Test-Path "data\smart_garden.db")) {
-              npm run init-db
-            }
-            
-            # Start application
-            Start-Process node -ArgumentList "app.js" -NoNewWindow -RedirectStandardOutput "logs\app.log" -RedirectStandardError "logs\error.log"
-            
-            echo "Deployment completed successfully"
+          script: cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}; if (!(Test-Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }})) { New-Item -ItemType Directory -Path ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }} -Force; cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}; git clone https://github.com/${{ github.repository }}.git . }; New-Item -ItemType Directory -Path "logs" -Force; New-Item -ItemType Directory -Path "data" -Force; taskkill /F /IM node.exe 2>$null || echo "No running Node.js process found"; if (Test-Path "app.js") { $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"; Compress-Archive -Path * -DestinationPath "backup_$timestamp.zip" -Force }; git fetch origin; git checkout main; git pull origin main; npm ci --production; if (!(Test-Path "data\smart_garden.db")) { npm run init-db }; Start-Process node -ArgumentList "app.js" -NoNewWindow -RedirectStandardOutput "logs\app.log" -RedirectStandardError "logs\error.log"; echo "Deployment completed successfully"
