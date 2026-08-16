@@ -46,6 +46,7 @@ app.use(helmet({
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
             frameSrc: ["'none'"],
+            formAction: ["'self'"],
         },
     },
     crossOriginEmbedderPolicy: false
