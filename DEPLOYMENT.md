@@ -9,6 +9,7 @@ This guide explains how to set up automatic deployment to your Windows server us
    - SSH enabled (OpenSSH Server)
    - Git installed
    - Node.js installed
+   - PM2 installed (for process management)
    - PowerShell available
 3. **Network Access** - GitHub Actions must be able to reach your server
 
@@ -90,7 +91,15 @@ choco install nodejs
 # Or download manually and install
 ```
 
-### 5. Configure .env File
+### 5. Install PM2 globally
+
+PM2 is used for process management:
+
+```powershell
+npm install -g pm2
+```
+
+### 6. Configure .env File
 
 Copy your `.env` file to the server:
 
@@ -99,7 +108,7 @@ Copy your `.env` file to the server:
 # Copy your existing .env content or create a new one
 ```
 
-### 6. Initial Git Setup (First Time Only)
+### 7. Initial Git Setup (First Time Only)
 
 ```powershell
 cd C:\smart-garden
@@ -120,12 +129,14 @@ The GitHub Actions workflow will:
    - Install dependencies
    - Run tests (if available)
    - Connect to Windows server via SSH
-   - Stop existing Node.js process
-   - Backup current version
+   - Setup deployment directory and logs/data folders
+   - Install PM2 globally (if not already installed)
+   - Stop existing PM2 process and create backup
    - Pull latest changes from GitHub
    - Install production dependencies
    - Initialize database if needed
-   - Start the application
+   - Start application using PM2
+   - Save PM2 process list for automatic restart
 
 2. **Manual trigger:**
    - You can also trigger deployment manually from GitHub Actions tab
@@ -178,6 +189,13 @@ Ensure the SSH user has:
 ```powershell
 # Check Node.js is installed
 node --version
+
+# Check PM2 is installed
+pm2 --version
+
+# Check PM2 process status
+pm2 status
+pm2 logs smart-garden
 
 # Check if port 3000 is available
 netstat -ano | findstr :3000
@@ -271,9 +289,11 @@ $latestBackup = Get-ChildItem -Filter "backup_*.zip" | Sort-Object LastWriteTime
 # Extract backup
 Expand-Archive -Path $latestBackup.FullName -DestinationPath . -Force
 
-# Restart application
-taskkill /F /IM node.exe 2>$null
-Start-Process node -ArgumentList "app.js" -NoNewWindow
+# Restart application with PM2
+pm2 stop smart-garden
+pm2 delete smart-garden
+pm2 start app.js --name smart-garden
+pm2 save
 ```
 
 Or use Git to revert:
@@ -287,9 +307,44 @@ git log --oneline -10
 # Revert to previous commit
 git checkout PREVIOUS_COMMIT_HASH
 
+# Restart application with PM2
+pm2 stop smart-garden
+pm2 delete smart-garden
+pm2 start app.js --name smart-garden
+pm2 save
+```
+
+## PM2 Management Commands
+
+Useful PM2 commands for managing your application:
+
+```powershell
+# View application status
+pm2 status
+
+# View application logs
+pm2 logs smart-garden
+
+# View detailed information
+pm2 show smart-garden
+
 # Restart application
-taskkill /F /IM node.exe 2>$null
-Start-Process node -ArgumentList "app.js" -NoNewWindow
+pm2 restart smart-garden
+
+# Stop application
+pm2 stop smart-garden
+
+# Delete application from PM2
+pm2 delete smart-garden
+
+# Monitor CPU and memory usage
+pm2 monit
+
+# Save current process list (for automatic restart on reboot)
+pm2 save
+
+# Setup PM2 to start on system boot
+pm2 startup
 ```
 
 ## Support

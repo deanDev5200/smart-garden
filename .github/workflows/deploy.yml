@@ -36,6 +36,15 @@ jobs:
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
           script: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "if (!(Test-Path '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}')) { New-Item -ItemType Directory -Path '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}' -Force; cd '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}'; git clone https://github.com/${{ github.repository }}.git . }; New-Item -ItemType Directory -Path 'logs' -Force; New-Item -ItemType Directory -Path 'data' -Force"
       
+      - name: Install PM2 globally
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.WINDOWS_SERVER_HOST }}
+          username: ${{ secrets.WINDOWS_SERVER_USER }}
+          password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
+          port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
+          script: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "npm install -g pm2"
+      
       - name: Stop application and backup
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -43,7 +52,7 @@ jobs:
           username: ${{ secrets.WINDOWS_SERVER_USER }}
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
-          script: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "cd '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}'; taskkill /F /IM node.exe 2>$null; if (Test-Path 'app.js') { $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'; Compress-Archive -Path * -DestinationPath \"backup_$timestamp.zip\" -Force }"
+          script: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "cd '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}'; pm2 stop smart-garden 2>$null; pm2 delete smart-garden 2>$null; if (Test-Path 'app.js') { $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'; Compress-Archive -Path * -DestinationPath \"backup_$timestamp.zip\" -Force }"
       
       - name: Pull latest changes
         uses: appleboy/ssh-action@v1.0.0
@@ -61,4 +70,4 @@ jobs:
           username: ${{ secrets.WINDOWS_SERVER_USER }}
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
-          script: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "cd '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}'; npm ci --production; if (!(Test-Path 'data\smart_garden.db')) { npm run init-db }; Start-Process node -ArgumentList 'app.js' -NoNewWindow -RedirectStandardOutput 'logs\app.log' -RedirectStandardError 'logs\error.log'; Write-Host 'Deployment completed successfully'"
+          script: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command "cd '${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\smart-garden' }}'; npm ci --production; if (!(Test-Path 'data\smart_garden.db')) { npm run init-db }; pm2 start app.js --name smart-garden; pm2 save; Write-Host 'Deployment completed successfully'"
