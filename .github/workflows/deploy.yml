@@ -48,7 +48,7 @@ jobs:
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
           source: "smart-garden-deploy.tar.gz"
-          target: ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}
+          target: ${{ secrets.WINDOWS_DEPLOY_PATH || '/c/smart-garden' }}
       
       - name: Extract and restart application on Windows server
         uses: appleboy/ssh-action@v1.0.0
@@ -58,7 +58,7 @@ jobs:
           password: ${{ secrets.WINDOWS_SERVER_PASSWORD }}
           port: ${{ secrets.WINDOWS_SERVER_PORT || 22 }}
           script: |
-            cd ${{ secrets.WINDOWS_DEPLOY_PATH || 'C:\\smart-garden' }}
+            cd ${{ secrets.WINDOWS_DEPLOY_PATH || '/c/smart-garden' }}
             
             # Stop existing application
             taskkill /F /IM node.exe 2>$null || echo "No running Node.js process found"
