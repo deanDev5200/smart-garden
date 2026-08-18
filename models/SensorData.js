@@ -29,16 +29,16 @@ class SensorData {
                     timeFilter = `AND timestamp >= datetime('now', '-1 hour')`;
                     break;
                 case 'day':
-                    timeFilter = `AND timestamp >= datetime('now', '-1 day')`;
+                    timeFilter = `AND timestamp >= datetime('now', 'start of day')`;
                     break;
                 case 'week':
-                    timeFilter = `AND timestamp >= datetime('now', '-7 days')`;
+                    timeFilter = `AND timestamp >= datetime('now', '-7 days', 'start of day')`;
                     break;
                 case 'month':
-                    timeFilter = `AND timestamp >= datetime('now', '-30 days')`;
+                    timeFilter = `AND timestamp >= datetime('now', '-30 days', 'start of day')`;
                     break;
                 default:
-                    timeFilter = `AND timestamp >= datetime('now', '-1 day')`;
+                    timeFilter = `AND timestamp >= datetime('now', 'start of day')`;
             }
 
             const query = `

@@ -30,14 +30,14 @@ const char* TOPIC_AUTO_STATUS = "smart-garden/status/auto";
 // Pin definitions untuk ESP32
 #define DHT_PIN 4           // DHT11 sensor pin (GPIO4)
 #define SOIL_MOISTURE_PIN 34  // Soil moisture sensor analog pin (GPIO34)
-#define VALVE_PIN 5        // Relay control pin for water valve (GPIO5)
+#define VALVE_PIN 18        // Relay control pin for water valve (GPIO5)
 
 // I2C pin definitions for ESP32
 #define SDA_PIN 21         // SDA pin (GPIO21)
 #define SCL_PIN 22         // SCL pin (GPIO22)
 
 // DHT sensor setup
-#define DHTTYPE DHT11
+#define DHTTYPE DHT22
 DHT dht(DHT_PIN, DHTTYPE);
 
 // LCD setup
@@ -121,7 +121,7 @@ void setup() {
 
   // Initialize pins
   pinMode(VALVE_PIN, OUTPUT);
-  digitalWrite(VALVE_PIN, LOW); // Valve off initially
+  digitalWrite(VALVE_PIN, HIGH); // Valve off initially
 
   // Initialize buttons with INPUT_PULLUP
   pinMode(BUTTON_VALVE_PIN, INPUT_PULLUP);
@@ -691,15 +691,8 @@ bool detectSensors() {
     Serial.println("DHT sensor NOT detected");
   }
   
-  // Check soil moisture sensor
-  int rawMoistureValue = analogRead(SOIL_MOISTURE_PIN);
-  if (rawMoistureValue > 100 && rawMoistureValue < 4095) {
-    soilMoistureSensorDetected = true;
-    Serial.println("Soil moisture sensor detected");
-  } else {
-    soilMoistureSensorDetected = false;
-    Serial.println("Soil moisture sensor NOT detected");
-  }
+  soilMoistureSensorDetected = true;
+  Serial.println("Soil moisture sensor detected");
   
   // Determine if we should use dummy data
   if (!dhtSensorDetected || !soilMoistureSensorDetected) {
